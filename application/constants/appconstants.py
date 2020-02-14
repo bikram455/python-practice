@@ -1,0 +1,1 @@
+ADD_USER_SUCCESS = 'Successfully added user '
