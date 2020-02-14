@@ -15,7 +15,7 @@ def home():
 
 @app.route('/getusers', methods=['GET'])
 def getUsers():
-    return jsonify({'users':  service.getTodos()})
+    return jsonify({'users':  service.getUsers()})
 
 @app.route('/getfutsals', methods=['GET'])
 def getFutsals():

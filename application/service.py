@@ -6,7 +6,7 @@ class Service(object):
     def __init__(self):
         pass
 
-    def getTodos(self):
+    def getUsers(self):
         data = []   
         cur.execute(QEURY_CONSTANTS.GET_USERS)
         rows = cur.fetchall()
