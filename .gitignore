@@ -1,2 +1,2 @@
-**/application/*/
-README.md
+__pycache__/
+*.pyc
