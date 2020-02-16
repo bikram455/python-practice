@@ -15,7 +15,15 @@ def home():
 
 @app.route('/getusers', methods=['GET'])
 def getUsers():
-    return jsonify({'users':  service.getTodos()})
+    try:
+        encoded = request.headers['Authorization'].split(' ')[1]
+        utils.checkTokenExpiry(encoded)
+        return jsonify({'users':  service.getTodos()})
+    except Exception as err:
+        if type(err) == jwt.exceptions.ExpiredSignature:
+            return jsonify({'message':  'Token expired, please login again'}), 409
+        else:
+            return jsonify({'message':  'Error while fetching user list'}), 500 
 
 @app.route('/getfutsals', methods=['GET'])
 def getFutsals():
