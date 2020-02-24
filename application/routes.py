@@ -3,7 +3,8 @@ import datetime
 from application import app
 from flask import request, jsonify
 from application.utils import Utils
-from application.service import Service
+from application.service import Service, FutsalExists
+import application.constants.errorconstants as ERROR_CONSTANTS
 
 service = Service()
 utils = Utils()
@@ -15,7 +16,13 @@ def home():
 
 @app.route('/getusers', methods=['GET'])
 def getUsers():
-    return jsonify({'users':  service.getUsers()})
+    try:
+        encoded = request.headers['Authorization'].split(' ')[1]
+        utils.checkTokenExpiry(encoded)
+        return jsonify({'users':  service.getUsers()})
+    except jwt.ExpiredSignature:
+        return jsonify({'message':  ERROR_CONSTANTS.TOKEN_EXPIRED}), 401
+    
 
 @app.route('/getfutsals', methods=['GET'])
 def getFutsals():
@@ -24,8 +31,7 @@ def getFutsals():
         utils.checkTokenExpiry(encoded)
         return jsonify({'futsals':  service.getFutsals()})
     except jwt.ExpiredSignature:
-        print('token is expired')
-        return jsonify({'message':  'Token expired, please login again'}), 401
+        return jsonify({'message':  ERROR_CONSTANTS.TOKEN_EXPIRED}), 401
 
 
 @app.route('/adduser', methods=['POST'])
@@ -35,6 +41,22 @@ def addUser():
         data['admin'] = False
     res = service.adduser(data)
     return jsonify({'message': res['message']}), res['status']
+
+@app.route('/addfutsal', methods=['POST'])
+def addFutsal():
+    try:
+        encoded = request.headers['Authorization'].split(' ')[1]
+        utils.checkTokenExpiry(encoded)
+        data = request.json
+        res = service.addFutsal(data)
+        return jsonify({'message': res['message']})
+    except Exception as err:
+        if(type(err) == jwt.ExpiredSignature):
+            return jsonify({'message': ERROR_CONSTANTS.TOKEN_EXPIRED}), 401
+        elif(isinstance(err, FutsalExists)):
+            return jsonify({'message': str(err)}), 409
+        else:
+            return jsonify({'message': ERROR_CONSTANTS.ADD_FUTSAL_ERROR}), 400
 
 @app.route('/login', methods=['POST'])
 def login():

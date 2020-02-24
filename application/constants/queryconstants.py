@@ -1,4 +1,6 @@
 GET_USERS = 'select * from dbo.users'     
 GET_FUTSALS = 'select * from dbo.futsals'
 CHECK_USER_EXISTS = 'select * from dbo.users where username=%s'
+CHECK_FUTSAL_EXISTS = 'select * from dbo.futsals where name=%s and address=%s'
 ADD_USER = 'INSERT INTO dbo.users(username, password, user_type) VALUES (%s, %s, %s)'
+ADD_FUTSAL = 'INSERT INTO dbo.futsals(name, address, opens, closes) VALUES (%s, %s, %s, %s)'

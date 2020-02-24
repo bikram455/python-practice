@@ -2,6 +2,11 @@ from application.connection import cur, conn
 import application.constants.queryconstants as QEURY_CONSTANTS
 import application.constants.appconstants as APP_CONSTANTS
 
+class FutsalExists(Exception):
+    def __init__(self, *args):
+        self.message = args[0]
+        pass
+
 class Service(object):
     def __init__(self):
         pass
@@ -57,3 +62,15 @@ class Service(object):
         except Exception:
             pass
             return Exception
+    
+    def addFutsal(self, futsal):
+        cur.execute(QEURY_CONSTANTS.CHECK_FUTSAL_EXISTS, (futsal['futsalName'], futsal['address'],))
+        rows = cur.fetchall()
+        if len(rows) == 0:
+            message = APP_CONSTANTS.ADD_FUTSAL_SUCCESS + futsal['futsalName']
+            cur.execute(QEURY_CONSTANTS.ADD_FUTSAL, (futsal['futsalName'], futsal['address'], futsal['opens'], futsal['closes'],))
+            conn.commit()
+            return({'message': message})
+        else:
+            message = 'Futsal "' + futsal['futsalName'] + '" already exists'
+            raise FutsalExists(message)
