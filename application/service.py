@@ -57,7 +57,7 @@ class Service(object):
             cur.execute(QEURY_CONSTANTS.GET_FUTSALS)
             rows = cur.fetchall()
             for row in rows:
-                data.append({'id': row[0], 'futsalName': row[1], 'address': row[2], 'opens': row[3], 'closes': row[4]})
+                data.append({'id': row[0], 'futsalName': row[1], 'address': row[2], 'opens': row[3].isoformat(), 'closes': row[4].isoformat()})
             return data
         except Exception:
             pass

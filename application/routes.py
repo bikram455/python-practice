@@ -29,10 +29,12 @@ def getFutsals():
     try:
         encoded = request.headers['Authorization'].split(' ')[1]
         utils.checkTokenExpiry(encoded)
-        return jsonify({'futsals':  service.getFutsals()})
-    except jwt.ExpiredSignature:
-        return jsonify({'message':  ERROR_CONSTANTS.TOKEN_EXPIRED}), 401
-
+        return jsonify({'users':  service.getTodos()})
+    except Exception as err:
+        if type(err) == jwt.exceptions.ExpiredSignature:
+            return jsonify({'message':  'Token expired, please login again'}), 409
+        else:
+            return jsonify({'message':  'Error while fetching user list'}), 500 
 
 @app.route('/adduser', methods=['POST'])
 def addUser():
@@ -78,3 +80,22 @@ def updateUser(id):
         'status': 200 if flag else 400
         }
     return jsonify({'message': data['message']}), data['status']
+
+@app.route('/getfutsals', methods=['GET'])
+def getFutsals():
+    try:
+        encoded = request.headers['Authorization'].split(' ')[1]
+        utils.checkTokenExpiry(encoded)
+        return jsonify({'futsals':  service.getFutsals()})
+    except jwt.ExpiredSignature:
+        return jsonify({'message':  'Token expired, please login again'}), 401
+
+@app.route('/addfutsal', methods=['POST'])
+def addfutsal():
+    try:
+        encoded = request.headers['Authorization'].split(' ')[1]
+        utils.checkTokenExpiry(encoded)
+        return jsonify({'futsals':  service.addFutsal(request.json)})
+    except Exception as err:
+        if(type(err) == jwt.ExpiredSignature):
+            return jsonify({'message':  'Token expired, please login again'}), 401
